@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     done = false;
     ui->setupUi(this);
+    QWidget::setWindowTitle("Analog Synth Emulator");
     initialize_filter();
 
     std::vector<std::string> midi_devices = setup_rtmidi();
