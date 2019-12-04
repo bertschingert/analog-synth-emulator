@@ -2,6 +2,7 @@
 
 This Qt application connects to a midi device and uses it to control an emulated analog synthesizer. 
 
+![Analog Synth Emulator](img/example.png)
 
 This is based on a partner project done for the CS312 class at Carleton College. It was a collaboration between me (Thomas Bertschinger) and Tore Banta (https://github.com/bantat/). 
 
