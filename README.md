@@ -7,4 +7,6 @@ This is based on a partner project done for the CS312 class at Carleton College.
 
 # Dependencies
 
-In addition to Qt, this application uses [RtAudio](https://www.music.mcgill.ca/~gary/rtaudio/) with the ALSA backend. 
+In addition to Qt, this application uses 
+* [RtAudio](https://www.music.mcgill.ca/~gary/rtaudio/) with the ALSA backend
+* [RtMidi](https://www.music.mcgill.ca/~gary/rtmidi/)
