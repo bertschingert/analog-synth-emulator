@@ -13,7 +13,6 @@
 
 
 RtMidiIn *midiin = 0;
-std::thread midi_thread(midi_watcher);
 
 std::mutex mtx_port_change;
 std::condition_variable cv_port_change;
