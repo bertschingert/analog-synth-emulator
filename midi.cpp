@@ -100,5 +100,4 @@ bool chooseMidiPort(int midi_device) {
 
 void midi_cleanup() {
     delete midiin;
-    midi_thread.join();
 }

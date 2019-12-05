@@ -11,9 +11,6 @@ std::queue<float> debug_samp;
 
 RtAudio dac;
 
-void initialize_audio();
-std::thread audio_thread(initialize_audio);
-
 std::queue<std::vector<unsigned char>> midi_q;
 std::mutex mtx_q;
 std::condition_variable cv_q;
@@ -445,7 +442,6 @@ void audio_cleanup() {
     } catch (RtAudioError &e) {
         e.printMessage();
     }
-    audio_thread.join();
 }
 
 float midi_to_freq(unsigned char note){

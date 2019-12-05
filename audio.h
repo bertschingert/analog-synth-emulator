@@ -134,6 +134,7 @@ int callback(void *outputBuffer, void * /*inputBuffer*/,
 
 float midi_to_freq(unsigned char);
 void initialize_filter();
+void initialize_audio();
 void audio_cleanup();
 
 #endif
