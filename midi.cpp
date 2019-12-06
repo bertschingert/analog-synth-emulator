@@ -18,7 +18,7 @@ std::mutex mtx_port_change;
 std::condition_variable cv_port_change;
 bool port_chosen = false;
 
-void mycallback(double deltatime, std::vector<unsigned char> *message,
+void mycallback(double /* deltatime*/, std::vector<unsigned char> *message,
                 void * /*userData*/) {
 //  int nBytes = message->size();
   // print the midi message to stdout
