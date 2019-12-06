@@ -146,6 +146,8 @@ public:
         output_volume(.75),
         midi_device(-1),
         pbend_range(100) {}
+
+    float get_sample();
 };
 
 extern Synthesizer g;
@@ -153,5 +155,10 @@ extern LowFrequencyOscillator l;
 extern ADSREnvelope e;
 extern Filter f;
 extern Distortion d;
+
+extern std::vector<float> wave_table_saw;
+extern std::vector<float> wave_table_sine;
+extern std::vector<float> wave_table_tri;
+extern std::vector<float> wave_table_square;
 
 #endif // SYNTHESIZER_H

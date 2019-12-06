@@ -30,18 +30,18 @@ std::vector<float> wave_table_square;
 
 int callback(void *outputBuffer, void * /*inputBuffer*/,
                   unsigned int nBufferFrames, double /*streamTime*/,
-                  RtAudioStreamStatus status, void *data) {
-  MY_TYPE *buffer = (MY_TYPE *)outputBuffer;
-  if (status) std::cout << "Stream underflow detected!" << std::endl;
+                  RtAudioStreamStatus status, void * /*data*/) {
+    MY_TYPE *buffer = (MY_TYPE *)outputBuffer;
+    if (status) std::cout << "Stream underflow detected!" << std::endl;
 
-  float val = 0;        // the output sample
-  float val_1 = 0;      // data point from osc 1
-  float val_2 = 0;      // data point from osc 2
-  float val_lfo = 0;    // data point from LFO
-  float steps = 0;      // used for bitcrusher
-  float index = 0;      // used for bitcrusher
+    float val = 0;        // the output sample
+    float val_1 = 0;      // data point from osc 1
+    float val_2 = 0;      // data point from osc 2
+    float val_lfo = 0;    // data point from LFO
+    float steps = 0;      // used for bitcrusher
+    float index = 0;      // used for bitcrusher
 
-  for (uint32_t i = 0; i < nBufferFrames; i++) {
+    for (uint32_t i = 0; i < nBufferFrames; i++) {
 
       // avoid excessively high frequency
        if (g.freq > 20000) {
@@ -51,55 +51,53 @@ int callback(void *outputBuffer, void * /*inputBuffer*/,
       }
 
       // LFO OPERATION BELOW
-      if(i%16 == 0){            // control period: 16 * sample period
-          if (g.freq != 0){     // only use LFO if a note is playing
-              if (l.enabled){   // and if it's enabled
-                  if (l.phase > TABLE_SIZE) l.phase = fmod(l.phase, TABLE_SIZE);
-                  if (l.phase < 0) l.phase = 0;
-                  switch (l.osc_type) {
-                  case 0:
-                      val_lfo = wave_table_sine.at((int) l.phase);
-                      break;
-                  case 1:
-                      val_lfo = wave_table_saw.at((int) l.phase);
-                      break;
-                  case 2:
-                      val_lfo = wave_table_tri.at((int) l.phase);
-                      break;
-                  case 3:
-                      val_lfo = wave_table_square.at((int) l.phase);
-                      break;
-                  }
-                  l.phase += l.phase_incr;
-                  if (l.phase > TABLE_SIZE) l.phase = fmod(l.phase, TABLE_SIZE);
+      if(i%16 == 0) {            // control period: 16 * sample period
+          if ((g.freq != 0) && l.enabled) {     // only use LFO if a note is playing
+              if (l.phase > TABLE_SIZE) l.phase = fmod(l.phase, TABLE_SIZE);
+              if (l.phase < 0) l.phase = 0;
+              switch (l.osc_type) {
+              case 0:
+                  val_lfo = wave_table_sine.at((int) l.phase);
+                  break;
+              case 1:
+                  val_lfo = wave_table_saw.at((int) l.phase);
+                  break;
+              case 2:
+                  val_lfo = wave_table_tri.at((int) l.phase);
+                  break;
+              case 3:
+                  val_lfo = wave_table_square.at((int) l.phase);
+                  break;
+              }
+              l.phase += l.phase_incr;
+              if (l.phase > TABLE_SIZE) l.phase = fmod(l.phase, TABLE_SIZE);
 
-                  if (l.choice == 0) { // LFO affects Frequency
-                      l.o_freq = g.freq * ( pow( pow(CENT, l.amount), val_lfo) );
-                      l.o_phase_incr = l.o_freq * phase_factor;
+              if (l.choice == 0) { // LFO affects Frequency
+                  l.o_freq = g.freq * ( pow( pow(CENT, l.amount), val_lfo) );
+                  l.o_phase_incr = l.o_freq * phase_factor;
+              }
+              else if (l.choice == 1) { // LFO affects Ratio
+                  l.o_ratio = ((l.amount / 1000.0) * val_lfo) + g.osc_ratio;
+                  if (l.o_ratio > 1)
+                      l.o_ratio = 1;
+                  if (l.o_ratio < 0)
+                      l.o_ratio = 0;
+              }
+              else if (l.choice == 2) { // LFO affects Filter
+                  l.f_cutoff = (l.amount * val_lfo) + f.cutoff;
+                  if (l.f_cutoff < 1) l.f_cutoff = 1;
+                  initialize_filter();
+              }
+              else if (l.choice == 3) { // LFO affects Distortion
+                  if (d.type == 0) { // for overdrive
+                      l.o_amount = (l.amount / 100.0) * val_lfo + d.o_amount;
+                      if (l.o_amount < 1) l.o_amount = 1;
+                      if (l.o_amount > 15) l.o_amount = 15;
                   }
-                  else if (l.choice == 1) { // LFO affects Ratio
-                      l.o_ratio = ((l.amount / 1000.0) * val_lfo) + g.osc_ratio;
-                      if (l.o_ratio > 1)
-                          l.o_ratio = 1;
-                      if (l.o_ratio < 0)
-                          l.o_ratio = 0;
-                  }
-                  else if (l.choice == 2) { // LFO affects Filter
-                      l.f_cutoff = (l.amount * val_lfo) + f.cutoff;
-                      if (l.f_cutoff < 1) l.f_cutoff = 1;
-                      initialize_filter();
-                  }
-                  else if (l.choice == 3) { // LFO affects Distortion
-                      if (d.type == 0) { // for overdrive
-                          l.o_amount = (l.amount / 100.0) * val_lfo + d.o_amount;
-                          if (l.o_amount < 1) l.o_amount = 1;
-                          if (l.o_amount > 15) l.o_amount = 15;
-                      }
-                      else if (d.type == 1) { // for bitcrushing
-                          l.b_amount = (l.amount / 100) * val_lfo + d.b_amount;
-                          if (l.b_amount < 2) l.b_amount = 2;
-                          if (l.b_amount > 16) l.b_amount = 16;
-                      }
+                  else if (d.type == 1) { // for bitcrushing
+                      l.b_amount = (l.amount / 100) * val_lfo + d.b_amount;
+                      if (l.b_amount < 2) l.b_amount = 2;
+                      if (l.b_amount > 16) l.b_amount = 16;
                   }
               }
           } else {
@@ -110,43 +108,7 @@ int callback(void *outputBuffer, void * /*inputBuffer*/,
           }
       } // end control period
 
-      // generate the waves with the oscillators
-      if (g.phase > TABLE_SIZE) g.phase = fmod(g.phase, TABLE_SIZE);
-      if (g.phase < 0) g.phase = 0;
-      switch (g.osc1_type) {
-      case 0:
-          val_1 = wave_table_sine.at((int) g.phase);
-          break;
-      case 1:
-          val_1 = wave_table_saw.at((int) g.phase);
-          break;
-      case 2:
-          val_1 = wave_table_tri.at((int) g.phase);
-          break;
-      case 3:
-          val_1 = wave_table_square.at((int) g.phase);
-          break;
-      }
-      switch (g.osc2_type) {
-      case 0:
-          val_2 = wave_table_sine.at((int) g.phase);
-          break;
-      case 1:
-          val_2 = wave_table_saw.at((int) g.phase);
-          break;
-      case 2:
-          val_2 = wave_table_tri.at((int) g.phase);
-          break;
-      case 3:
-          val_2 = wave_table_square.at((int) g.phase);
-          break;
-      }
-
-    // RATIO
-    if(l.enabled && l.choice == 1) {
-        val = (val_1 *  l.o_ratio) + (val_2 * (1 - l.o_ratio));
-    } else
-        val = (val_1 *  g.osc_ratio) + (val_2 * (1 - g.osc_ratio));
+    val = g.get_sample();
 
     // DISTORTION
     if (d.enabled) {
