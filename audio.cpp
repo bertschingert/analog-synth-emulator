@@ -1,11 +1,13 @@
 #include "audio.h"
+#include "synthesizer.h"
 #include "RtAudio.h"
 
-Globals g;
-LFO_Globals l;
-Envelope_Globals e;
-Filter_Globals f;
-Distortion_Globals d;
+Synthesizer g;
+LowFrequencyOscillator l;
+ADSREnvelope e;
+Filter f;
+Distortion d;
+
 std::ofstream out_log;
 std::queue<float> debug_samp;
 
@@ -380,18 +382,18 @@ void print_audio_device_info() {
     std::cout << "default dev: " << def << " name: " << info.name << std::endl;
 }
 
-void initialize_audio(){
+void initialize_audio() {
     // hardcoding the device for now... may need to make this chooseable by user
     unsigned int device = 6;
     unsigned int channels = 1;
     unsigned int bufferFrames = 512;
     unsigned int offset = 0;
 
+    initialize_wavetables();
+
     RtAudio::StreamParameters oParams;
     RtAudio::StreamOptions options;
     double *rtdata = (double *)calloc(channels, sizeof(double));
-
-    print_audio_device_info();
 
     // out_log is used to keep track of debugging information
     out_log.open("log.txt");
@@ -422,7 +424,6 @@ void initialize_audio(){
     } catch (RtAudioError &e) {
         e.printMessage();
     }
-    initialize_wavetables();
     watch_midi();
 }
 

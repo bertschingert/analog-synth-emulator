@@ -27,13 +27,15 @@ SOURCES += main.cpp\
     RtMidi.cpp \
     midi.cpp \
     audio.cpp \
-    RtAudio.cpp
+    RtAudio.cpp \
+    synthesizer.cpp
 
 HEADERS  += mainwindow.h \
     RtMidi.h \
     midi.h \
     audio.h \
-    RtAudio.h
+    RtAudio.h \
+    synthesizer.h
 
 FORMS    += mainwindow.ui
 
@@ -41,5 +43,5 @@ CONFIG += C++14 \
 
 LIBS += -L$$PWD/ -lrtaudio_static -lasound -lpthread
 
-QMAKE_CXXFLAGS += -D__LINUX_ALSA__
+QMAKE_CXXFLAGS += -D__LINUX_ALSA__ -g
 QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas

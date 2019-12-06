@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "audio.h"
+#include "synthesizer.h"
 #include "midi.h"
 
 bool done;
