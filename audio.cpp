@@ -35,8 +35,6 @@ int callback(void *outputBuffer, void * /*inputBuffer*/,
     if (status) std::cout << "Stream underflow detected!" << std::endl;
 
     float val = 0;        // the output sample
-    float val_1 = 0;      // data point from osc 1
-    float val_2 = 0;      // data point from osc 2
     float val_lfo = 0;    // data point from LFO
     float steps = 0;      // used for bitcrusher
     float index = 0;      // used for bitcrusher
